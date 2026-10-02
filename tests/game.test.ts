@@ -78,9 +78,9 @@ describe('game', () => {
 
   test('the snake speeds up every five foods, down to a floor', () => {
     const game = newGame(10, 6, first)
-    expect(tickMs(game)).toBe(63)
-    expect(tickMs({ ...game, score: 5 })).toBe(58)
-    expect(tickMs({ ...game, score: 100 })).toBe(30)
+    expect(tickMs(game)).toBe(83)
+    expect(tickMs({ ...game, score: 5 })).toBe(76)
+    expect(tickMs({ ...game, score: 100 })).toBe(40)
   })
 
   test('fitTo keeps a game that fits and resizes it', () => {

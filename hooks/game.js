@@ -3,10 +3,10 @@ export const MIN_HEIGHT = 4
 
 const MOVES = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }
 const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' }
-const START_TICK_MS = 63
-const FASTEST_TICK_MS = 30
+const START_TICK_MS = 83
+const FASTEST_TICK_MS = 40
 const FOODS_PER_SPEEDUP = 5
-const SPEEDUP_MS = 5
+const SPEEDUP_MS = 7
 const MAX_QUEUED_TURNS = 2
 
 export function newGame(width, height, random = Math.random) {

@@ -46,7 +46,7 @@ Warp, so it draws only text cells: no pixel graphics.
 - Arrow keys or WASD turn the snake. A turn straight back into the body is
   ignored. Two quick presses inside one tick are both kept, in order.
 - Space pauses and resumes. After game over, Space starts a new game.
-- The snake starts at 16 moves a second (63 ms a move) and gets faster every 5 foods, up to a
+- The snake starts at 12 moves a second (83 ms a move) and gets faster every 5 foods, up to a
   limit.
 - Hitting the wall or the body ends the game: "Game over · Space to play again".
 - The top line: score, best score, and Claude's state (`● working` or
