@@ -96,6 +96,7 @@ function startCountdown($) {
 async function goAway($) {
   cancelTimer()
   phase = 'idle'
+  if (savedGame) await $.store.set('game', savedGame)
 }
 
 /** @type {import('claude-code').Register} */
