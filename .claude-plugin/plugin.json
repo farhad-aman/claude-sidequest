@@ -1,0 +1,5 @@
+{
+  "name": "snake-pane",
+  "version": "0.1.0",
+  "description": "Play Snake in a side pane while Claude works; works in any terminal"
+}
