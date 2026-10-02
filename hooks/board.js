@@ -1,6 +1,6 @@
 import { MIN_HEIGHT, MIN_WIDTH, fitTo, newGame, step, tickMs, turn } from './game.js'
 
-const FRAME_MS = 25
+const FRAME_MS = 16
 const STATUS_AND_HINT_AND_WALL_ROWS = 4
 const SNAKE_COLOR = '#4ade80'
 const FOOD_COLOR = '#f87171'
@@ -46,9 +46,10 @@ function onFrame(surface) {
   }
   if (state.isPaused || state.props.isPaused || game.isOver) return
   state.elapsedMs += FRAME_MS
-  if (state.elapsedMs < tickMs(game)) return
+  const moveMs = tickMs(game)
+  if (state.elapsedMs < moveMs) return
   const next = step(game)
-  update(surface, { game: next, best: Math.max(state.best, next.score), elapsedMs: 0 })
+  update(surface, { game: next, best: Math.max(state.best, next.score), elapsedMs: state.elapsedMs - moveMs })
 }
 
 function onKey(surface, key) {
