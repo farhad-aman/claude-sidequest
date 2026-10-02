@@ -40,6 +40,10 @@ function onFrame(surface) {
     surface.setState({ ...state, game: fitted, isPaused: true, elapsedMs: 0 })
     return
   }
+  if (state.props.isPaused && !state.isPaused) {
+    surface.setState({ ...state, isPaused: true })
+    return
+  }
   if (state.isPaused || state.props.isPaused || game.isOver) return
   state.elapsedMs += FRAME_MS
   if (state.elapsedMs < tickMs(game)) return

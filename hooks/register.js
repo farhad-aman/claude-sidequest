@@ -1,5 +1,4 @@
 const PANE = 'snake'
-const MIN_BOARD_ROWS = 8
 const DROP_IN_DELAY_MS = 2000
 const COUNTDOWN_SECONDS = 3
 
@@ -209,7 +208,7 @@ export const register = (on) => {
           module: './board.js',
           props: boardProps(),
           width: e.props.bodyColumns,
-          height: Math.max(MIN_BOARD_ROWS, e.props.scroll.bodyRows),
+          height: e.props.scroll.bodyRows,
         }),
       ],
     })
