@@ -15,6 +15,7 @@ export function world(on: On, stored: Record<string, unknown> = {}) {
     return { value: undefined }
   })
   on('ui.invalidate', () => ({ value: undefined }))
+  on('ui.render', () => ({ type: 'Box', props: {}, children: [] }) as any)
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))
