@@ -31,7 +31,7 @@ describe('review fixes', () => {
   test('the board is as tall as the pane body, even a short one', async ($, on) => {
     world(on)
     await startSession($)
-    await $.command.run({ command: 'snake', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 160 } })
+    await $.command.run({ command: 'sidequest', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 160 } })
     const ui = await $.ui.mount({ ...PANE_MOUNT, props: { ...PANE_MOUNT.props, scroll: { offset: 0, bodyRows: 6 } } } as any)
     const client = await ui.find({ type: 'Client' })
     expect(client?.props.height).toBe(6)

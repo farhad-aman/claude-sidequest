@@ -20,9 +20,9 @@ async function shown(ui: any) {
 }
 
 describe('board', () => {
-  test('/snake opens the pane and the board starts paused', async ($, on) => {
+  test('/sidequest opens the pane and the board starts paused', async ($, on) => {
     const { ui, w } = await openBoard($, on)
-    expect(w.panes.opened).toEqual(['snake'])
+    expect(w.panes.opened).toEqual(['sidequest'])
     expect(await shown(ui)).toContain('Score 0')
     expect(await shown(ui)).toContain('Paused')
   })

@@ -1,8 +1,11 @@
-const PANE = 'snake'
+import { GAMES, gameById } from './games/index.js'
+
+const PANE = 'sidequest'
 const DROP_IN_DELAY_MS = 2000
 const COUNTDOWN_SECONDS = 3
 
 let isOn = true
+let currentGame = GAMES[0].id
 let best = 0
 let savedGame = null
 let phase = 'idle'
@@ -23,6 +26,7 @@ function boardProps() {
 
 async function loadStore($) {
   isOn = (await $.store.get('isOn')) !== false
+  currentGame = (gameById(await $.store.get('lastGame')) ?? GAMES[0]).id
   const storedBest = await $.store.get('best')
   best = typeof storedBest === 'number' ? storedBest : 0
   savedGame = (await $.store.get('game')) ?? null
@@ -31,6 +35,11 @@ async function loadStore($) {
 function cancelTimer() {
   timer?.cancel()
   timer = null
+}
+
+async function chooseGame($, id) {
+  currentGame = id
+  await $.store.set('lastGame', id)
 }
 
 function armDropIn($) {
@@ -42,7 +51,7 @@ function armDropIn($) {
 async function dropIn($) {
   if (phase !== 'waiting') return
   timer = null
-  const opened = await $.ui.open({ id: PANE, title: 'snake' })
+  const opened = await $.ui.open({ id: PANE, title: PANE })
   if (!opened.isPlaced) {
     await $.ui.close({ id: PANE })
     phase = 'offered'
@@ -55,7 +64,7 @@ async function dropIn($) {
 
 async function acceptOffer($) {
   if (phase !== 'offered') return
-  const opened = await $.ui.open({ id: PANE, title: 'snake' })
+  const opened = await $.ui.open({ id: PANE, title: PANE })
   if (!opened.isPlaced) {
     await $.ui.close({ id: PANE })
     return
@@ -103,30 +112,36 @@ export const register = (on) => {
   on('session.start', async ($, e, next) => {
     await loadStore($)
     await $.command.register({
-      name: 'snake',
-      description: 'Play Snake while Claude works',
-      argumentHint: '[on|off]',
+      name: 'sidequest',
+      description: 'Play a game while Claude works',
+      argumentHint: '[on|off|<game>]',
     })
     return next(e)
   })
 
-  on('command.run', { command: 'snake' }, async ($, e) => {
-    const arg = e.args.trim()
+  on('command.run', { command: 'sidequest' }, async ($, e) => {
+    const arg = e.args.trim().toLowerCase()
     if (arg === 'off') {
       isOn = false
       await $.store.set('isOn', false)
       await handBack($)
-      return { text: 'Snake will not open by itself now. /snake on turns it back on.' }
+      return { text: 'Sidequest will not open by itself now. /sidequest on turns it back on.' }
     }
     if (arg === 'on') {
       isOn = true
       await $.store.set('isOn', true)
       armDropIn($)
-      return { text: 'Snake opens by itself while Claude works.' }
+      return { text: 'Sidequest opens by itself while Claude works.' }
+    }
+    if (arg) {
+      const game = gameById(arg)
+      if (!game) return { text: `No game named ${arg}. Games: ${GAMES.map(({ id }) => id).join(', ')}.` }
+      await chooseGame($, game.id)
     }
     cancelTimer()
     phase = 'playing'
-    await $.ui.open({ id: PANE, title: 'snake' })
+    await $.ui.open({ id: PANE, title: PANE })
+    $.ui.invalidate('ui.render')
     return {}
   })
 
@@ -181,7 +196,7 @@ export const register = (on) => {
     return Box({
       flexDirection: 'column',
       children: [
-        Button({ key: 'play', label: 'Play Snake while Claude works', hotkey: '1', plain: true, onPress: () => acceptOffer($) }),
+        Button({ key: 'play', label: `Play ${gameById(currentGame).title} while Claude works`, hotkey: '1', plain: true, onPress: () => acceptOffer($) }),
         ...(others ? [others] : []),
       ],
     })

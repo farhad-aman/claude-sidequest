@@ -44,7 +44,7 @@ describe('store', () => {
     const before = await boardRows(ui)
     await $.turn.complete({ answer: '', durationMs: 2000, isAborted: true, turnId: 't1', reason: 'aborted' })
     await ui.unmount()
-    expect(w.panes.closed).toEqual(['snake'])
+    expect(w.panes.closed).toEqual(['sidequest'])
 
     await startSession($)
     ui = await openBoard($)
@@ -65,7 +65,7 @@ describe('store', () => {
     expect(await shown(ui)).toContain('Best 12')
   })
 
-  test('/snake off is kept for the next session', async ($, on) => {
+  test('/sidequest off is kept for the next session', async ($, on) => {
     const w = world(on)
     await startSession($)
     await runCommand($, 'off')
