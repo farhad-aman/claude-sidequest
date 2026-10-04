@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { fitTo, newGame, step, tickMs, turn } from '../hooks/game.js'
+import { fitTo, newGame, step, tickMs, turn } from '../hooks/games/snake/rules.js'
+import snake from '../hooks/games/snake/index.js'
 
 const first = () => 0
 
@@ -92,5 +93,18 @@ describe('game', () => {
     expect(fitTo(newGame(10, 6, first), 5, 6)).toBeNull()
     expect(fitTo({ snake: 'no' }, 10, 6)).toBeNull()
     expect(fitTo(null, 10, 6)).toBeNull()
+  })
+
+  test('the Snake object turns on arrows and WASD, ignores other keys', () => {
+    const game = snake.start({ columns: 42, rows: 12 })
+    expect(snake.key(game, 'up').queued).toEqual(['up'])
+    expect(snake.key(game, 'W').queued).toEqual(['up'])
+    expect(snake.key(game, 'x')).toBeNull()
+  })
+
+  test('the Snake object uses two columns a cell and two wall rows', () => {
+    const game = snake.start({ columns: 42, rows: 12 })
+    expect(game.width).toBe(20)
+    expect(game.height).toBe(10)
   })
 })

@@ -1,4 +1,4 @@
-import { MIN_HEIGHT, MIN_WIDTH, fitTo, newGame, step, tickMs, turn } from './game.js'
+import { MIN_HEIGHT, MIN_WIDTH, fitTo, newGame, step, tickMs, turn } from './games/snake/rules.js'
 
 const FRAME_MS = 16
 const STATUS_AND_HINT_AND_WALL_ROWS = 4

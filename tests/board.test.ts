@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { newGame } from '../hooks/game.js'
+import { newGame } from '../hooks/games/snake/rules.js'
 import { PANE_MOUNT, runCommand, startSession, world } from './world.ts'
 
 const BOARD = { columns: 42, rows: 14 }
