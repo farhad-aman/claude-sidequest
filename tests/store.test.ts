@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
+import { newGame } from '../hooks/games/snake/rules.js'
 import { PANE_MOUNT, runCommand, startSession, world } from './world.ts'
 
 const BOARD = { columns: 42, rows: 14, in: 'board' }
@@ -56,7 +57,7 @@ describe('store', () => {
     const w = world(on)
     await startSession($)
     let ui = await openBoard($)
-    await ui.post({ game: null, best: 12 }, { in: 'board' })
+    await ui.post({ gameId: 'snake', state: null, best: 12 }, { in: 'board' })
     await abortTurn($, w)
     await ui.unmount()
 
@@ -74,5 +75,48 @@ describe('store', () => {
     await $.turn.start({ text: 'go', turnId: 't2' })
     await w.clock.advance(5000)
     expect(w.panes.opened).toEqual([])
+  })
+
+  test('old keys from before many games move to Snake once', async ($, on) => {
+    const saved = { ...newGame(20, 10, () => 0), score: 7 }
+    const w = world(on, { best: 12, game: saved })
+    await startSession($)
+    expect(w.store.has('best')).toBe(false)
+    expect(w.store.has('game')).toBe(false)
+    expect(w.store.get('best:snake')).toBe(12)
+    const ui = await openBoard($)
+    expect(await shown(ui)).toContain('Score 7')
+    expect(await shown(ui)).toContain('Best 12')
+  })
+
+  test('an old store with only a saved game moves it to Snake', async ($, on) => {
+    const saved = { ...newGame(20, 10, () => 0), score: 5 }
+    const w = world(on, { game: saved })
+    await startSession($)
+    expect(w.store.get('game:snake')).toEqual(saved)
+    const ui = await openBoard($)
+    expect(await shown(ui)).toContain('Score 5')
+  })
+
+  test('old keys do not replace new ones', async ($, on) => {
+    const w = world(on, { best: 3, 'best:snake': 20 })
+    await startSession($)
+    expect(w.store.get('best:snake')).toBe(20)
+    expect(w.store.has('best')).toBe(false)
+  })
+
+  test('a post that names an unknown game changes nothing', async ($, on) => {
+    const w = world(on)
+    await startSession($)
+    let ui = await openBoard($)
+    await ui.post({ gameId: 'gone', state: { x: 1 }, best: 99 }, { in: 'board' })
+    await ui.post({ gameId: '__proto__', state: { x: 1 }, best: 99 }, { in: 'board' })
+    await abortTurn($, w)
+    await ui.unmount()
+
+    await startSession($)
+    ui = await openBoard($)
+    expect(await shown(ui)).toContain('Best 0')
+    expect(w.store.has('best:gone')).toBe(false)
   })
 })

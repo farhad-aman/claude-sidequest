@@ -19,7 +19,7 @@ async function shown(ui: any) {
   return texts.map((t: any) => t.text).join('\n')
 }
 
-describe('board', () => {
+describe('frame', () => {
   test('/sidequest opens the pane and the board starts paused', async ($, on) => {
     const { ui, w } = await openBoard($, on)
     expect(w.panes.opened).toEqual(['sidequest'])
@@ -67,13 +67,13 @@ describe('board', () => {
 
   test('a saved game that does not fit starts a new one', async ($, on) => {
     const huge = { ...newGame(60, 40, () => 0), score: 7 }
-    const { ui } = await openBoard($, on, { game: huge })
+    const { ui } = await openBoard($, on, { 'game:snake': huge })
     expect(await shown(ui)).toContain('Score 0')
   })
 
   test('a saved game that fits comes back paused', async ($, on) => {
     const saved = { ...newGame(20, 10, () => 0), score: 7 }
-    const { ui } = await openBoard($, on, { game: saved })
+    const { ui } = await openBoard($, on, { 'game:snake': saved })
     expect(await shown(ui)).toContain('Score 7')
     expect(await shown(ui)).toContain('Paused')
   })
@@ -83,5 +83,30 @@ describe('board', () => {
     await ui.resize({ columns: 10, rows: 5, in: 'board' })
     await ui.advance(25)
     expect(await shown(ui)).toContain('Make the pane bigger')
+  })
+
+  test('the status line names the game', async ($, on) => {
+    const { ui } = await openBoard($, on)
+    expect(await shown(ui)).toContain('Snake · Score 0 · Best 0')
+  })
+
+  test('with one game, m does nothing and the hint offers no menu', async ($, on) => {
+    const { ui } = await openBoard($, on)
+    await ui.key({ key: 'm', in: 'board' })
+    expect(await shown(ui)).not.toContain('choose')
+    await ui.key({ key: 'up', in: 'board' })
+    expect(await shown(ui)).toContain('Arrows or WASD turn · Space pauses')
+    expect(await shown(ui)).not.toContain('m games')
+  })
+
+  test('a last game that is not in the list opens the first game', async ($, on) => {
+    const { ui } = await openBoard($, on, { lastGame: 'gone' })
+    expect(await shown(ui)).toContain('Snake · Score 0')
+  })
+
+  test('the board keeps its key and module', async ($, on) => {
+    const { ui } = await openBoard($, on)
+    const client = await ui.find({ type: 'Client' })
+    expect(client?.props.module).toContain('frame.js')
   })
 })

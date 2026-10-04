@@ -3,11 +3,11 @@ import { GAMES, gameById } from './games/index.js'
 const PANE = 'sidequest'
 const DROP_IN_DELAY_MS = 2000
 const COUNTDOWN_SECONDS = 3
+const OLD_KEYS = { best: 'best:snake', game: 'game:snake' }
 
 let isOn = true
 let currentGame = GAMES[0].id
-let best = 0
-let savedGame = null
+let saves = {}
 let phase = 'idle'
 let isTurnRunning = false
 let isDismissed = false
@@ -16,20 +16,32 @@ let countdown = 0
 
 function boardProps() {
   return {
-    game: savedGame,
-    best,
+    gameId: currentGame,
+    saves,
     isPaused: phase === 'countdown',
     isClaudeWorking: isTurnRunning,
     countdown: phase === 'countdown' ? countdown : null,
   }
 }
 
+async function moveOldKeys($) {
+  for (const [oldKey, newKey] of Object.entries(OLD_KEYS)) {
+    const value = await $.store.get(oldKey)
+    if (value === undefined) continue
+    if ((await $.store.get(newKey)) === undefined) await $.store.set(newKey, value)
+    await $.store.delete(oldKey)
+  }
+}
+
 async function loadStore($) {
+  await moveOldKeys($)
   isOn = (await $.store.get('isOn')) !== false
   currentGame = (gameById(await $.store.get('lastGame')) ?? GAMES[0]).id
-  const storedBest = await $.store.get('best')
-  best = typeof storedBest === 'number' ? storedBest : 0
-  savedGame = (await $.store.get('game')) ?? null
+  saves = {}
+  for (const { id } of GAMES) {
+    const best = await $.store.get(`best:${id}`)
+    saves[id] = { state: (await $.store.get(`game:${id}`)) ?? null, best: typeof best === 'number' ? best : 0 }
+  }
 }
 
 function cancelTimer() {
@@ -104,7 +116,9 @@ function startCountdown($) {
 async function goAway($) {
   cancelTimer()
   phase = 'idle'
-  if (savedGame) await $.store.set('game', savedGame)
+  for (const [id, save] of Object.entries(saves)) {
+    if (save.state) await $.store.set(`game:${id}`, save.state)
+  }
 }
 
 /** @type {import('claude-code').Register} */
@@ -204,23 +218,28 @@ export const register = (on) => {
 
   on('ui.message', async ($, e) => {
     if (e.element !== 'board') return {}
-    savedGame = e.data.game ?? null
-    if (typeof e.data.best === 'number' && e.data.best > best) {
-      best = e.data.best
-      await $.store.set('best', best)
+    if (gameById(e.data.lastGame)) {
+      await chooseGame($, e.data.lastGame)
+      return {}
     }
+    const { gameId } = e.data
+    if (!gameById(gameId)) return {}
+    const old = saves[gameId]
+    const best = typeof e.data.best === 'number' ? Math.max(old.best, e.data.best) : old.best
+    saves = { ...saves, [gameId]: { state: e.data.state ?? null, best } }
+    if (best > old.best) await $.store.set(`best:${gameId}`, best)
     return {}
   })
 
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
     const { Box, Text, Client } = $.ui.resolve(e)
-    if (e.surface !== 'terminal') return Text({ children: ['Snake plays in the terminal.'] })
+    if (e.surface !== 'terminal') return Text({ children: ['Sidequest plays in the terminal.'] })
     return Box({
       children: [
         Client({
           key: 'board',
-          module: './board.js',
+          module: './frame.js',
           props: boardProps(),
           width: e.props.bodyColumns,
           height: e.props.scroll.bodyRows,
