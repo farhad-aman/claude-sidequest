@@ -119,4 +119,14 @@ describe('store', () => {
     expect(await shown(ui)).toContain('Best 0')
     expect(w.store.has('best:gone')).toBe(false)
   })
+
+  test('a game picked in the menu is kept and redraws the pane', async ($, on) => {
+    const w = world(on)
+    await startSession($)
+    const ui = await openBoard($)
+    const before = w.panes.redraws
+    await ui.post({ lastGame: 'snake' }, { in: 'board' })
+    expect(w.store.get('lastGame')).toBe('snake')
+    expect(w.panes.redraws).toBeGreaterThan(before)
+  })
 })

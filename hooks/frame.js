@@ -82,7 +82,7 @@ function onFrame(surface) {
 
 function onKey(surface, key) {
   const state = surface.state
-  if (!state.game || state.props.isPaused) return
+  if (!state.game || state.size === null || state.props.isPaused) return
   if (state.menu) {
     onMenuKey(surface, key)
     return

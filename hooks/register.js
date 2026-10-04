@@ -220,6 +220,7 @@ export const register = (on) => {
     if (e.element !== 'board') return {}
     if (gameById(e.data.lastGame)) {
       await chooseGame($, e.data.lastGame)
+      $.ui.invalidate('ui.render')
       return {}
     }
     const { gameId } = e.data

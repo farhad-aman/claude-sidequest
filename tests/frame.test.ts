@@ -109,4 +109,19 @@ describe('frame', () => {
     const client = await ui.find({ type: 'Client' })
     expect(client?.props.module).toContain('frame.js')
   })
+
+  test('space on a saved game over does not crash while the pane is too small', async ($, on) => {
+    const over = { ...newGame(20, 10, () => 0), score: 3, isOver: true }
+    world(on, { 'game:snake': over })
+    await startSession($)
+    await runCommand($, '')
+    const ui = await $.ui.mount(PANE_MOUNT)
+    await ui.resize({ columns: 10, rows: 5, in: 'board' })
+    await ui.advance(25)
+    await ui.key({ key: ' ', in: 'board' })
+    await ui.resize({ ...BOARD, in: 'board' })
+    await ui.advance(25)
+    expect(await shown(ui)).toContain('Score 3')
+    expect(await shown(ui)).toContain('Game over')
+  })
 })

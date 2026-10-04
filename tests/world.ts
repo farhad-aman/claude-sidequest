@@ -15,7 +15,7 @@ export function world(on: On, stored: Record<string, unknown> = {}) {
     return { value: undefined }
   })
   on('store.keys', () => ({ value: [...store.keys()] }))
-  const panes = { opened: [] as string[], closed: [] as string[] }
+  const panes = { opened: [] as string[], closed: [] as string[], redraws: 0 }
   let isPlaced = true
   on('ui.open', ($, e) => {
     panes.opened.push(e.id)
@@ -25,7 +25,10 @@ export function world(on: On, stored: Record<string, unknown> = {}) {
     panes.closed.push(e.id)
     return { value: undefined }
   })
-  on('ui.invalidate', () => ({ value: undefined }))
+  on('ui.invalidate', () => {
+    panes.redraws += 1
+    return { value: undefined }
+  })
   on('ui.render', () => ({ type: 'Box', props: {}, children: [] }) as any)
   on('command.register', ($, e) => ({ value: { command: e.name } }))
   on('session.start', ($, e) => ({ cwd: e.cwd }))
