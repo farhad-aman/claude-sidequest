@@ -66,7 +66,8 @@ plain JSON, because the frame saves it.
 | `start(size)` | `({columns, rows}) → state` | A new game that fills the play area. |
 | `restore(saved, size)` | `(unknown, {columns, rows}) → state \| null` | The saved game fitted to the play area, or `null` when it is not a valid game of this kind or does not fit. |
 | `key(state, key)` | `(state, string) → state \| null` | The state after a key. `null` when the game does not use the key. |
-| `tick(state, ms)` | `(state, number) → state` | Moves time forward by `ms`. |
+| `stepMs(state)` | `state → number \| null` | Time between two moves, in ms. `null` when the game does not move by itself. |
+| `step(state)` | `state → state` | One move of the game. |
 | `score(state)` | `state → number` | The score now. |
 | `isOver(state)` | `state → boolean` | True after game over. |
 | `draw(state, elements)` | `(state, ClientElements) → element` | Draws the play area, walls included. |
@@ -75,9 +76,9 @@ plain JSON, because the frame saves it.
 and the hint line. The game decides its own cell size (Snake uses 2 columns a
 cell) and its own walls.
 
-Snake moves its timing into its state: `tick` adds `ms` to `elapsedMs` and
-steps when it reaches the move time, the way `board.js` does now. A saved Snake
-game without `elapsedMs` is restored with `elapsedMs: 0`.
+The frame counts the time, so a game does not redraw or save while nothing
+moves. Snake's `stepMs` is today's `tickMs` and its `step` is today's `step`.
+The saved Snake game keeps its shape.
 
 ## The frame (`hooks/frame.js`)
 
@@ -97,7 +98,9 @@ The Client module in the pane. It does what `board.js` does now, for any game:
   When the size changes, it calls `restore` with the current state, else
   `start`, and pauses.
 - Timing: one 16 ms frame clock. While playing (not paused, not paused by
-  Claude, menu closed, not over) it calls `tick(state, 16)`.
+  Claude, menu closed, not over) it adds 16 ms to its count, and calls `step`
+  each time the count reaches `stepMs`, keeping what is left over, the way
+  `board.js` does now.
 - Keys reach the frame only after the person clicks the pane. `Esc` gives the
   focus back to the terminal, so the frame never uses it.
   - `Space`: pause or play; after game over, a new game.
@@ -156,6 +159,8 @@ store as `best:snake`. This is not code.
 | `/sidequest on` | Turns the auto-open back on (unchanged behaviour). |
 | `/sidequest <unknown>` | Text: `No game named <x>. Games: snake.` The pane does not open. |
 
+The argument is not case sensitive: `/sidequest Snake` opens Snake.
+
 The pane id and the pane title become `sidequest`. The offer above the prompt
 says `Play <title> while Claude works`, with the last game's title.
 
@@ -164,6 +169,7 @@ says `Play <title> while Claude works`, with the last game's title.
 - `restore` gives `null`: a new game starts, paused.
 - `lastGame` names a game that is not in `GAMES`: the first game is used.
 - A game in `GAMES` with a missing or wrong part: `games.test.ts` fails.
+- A post from the frame that names a game not in `GAMES` is ignored.
 
 ## Tests
 
@@ -174,7 +180,7 @@ Each test is written before its code (TDD).
 - `games.test.ts`: for every game in `GAMES`: all parts are there; `start`
   gives JSON-safe state that `fits`; `restore(start(size), size)` gives it
   back; `restore` of junk gives `null`; `key` of an unused key gives `null`;
-  ids are unique.
+  ids are unique; `stepMs` is a positive number or `null`.
 - `menu.test.ts`: with 2 fake games: moves, wraps, picks, closes.
 - `store.test.ts`: old keys `best` and `game` move to the new keys once.
 - `turns.test.ts`: `/sidequest snake` opens Snake; an unknown name gives the
