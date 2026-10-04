@@ -39,7 +39,7 @@ describe('frame', () => {
   test('the snake keeps its real speed, not rounded to the frame clock', async ($, on) => {
     const { ui } = await openBoard($, on)
     await ui.key({ key: 'right', in: 'board' })
-    await ui.advance(1180)
+    await ui.advance(1360)
     expect(await shown(ui)).not.toContain('Game over')
     await ui.advance(30)
     expect(await shown(ui)).toContain('Game over')

@@ -3,7 +3,7 @@ export const MIN_HEIGHT = 4
 
 const MOVES = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }
 const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' }
-const START_TICK_MS = 100
+const START_TICK_MS = 115
 const FASTEST_TICK_MS = 40
 const FOODS_PER_SPEEDUP = 5
 const SPEEDUP_MS = 7

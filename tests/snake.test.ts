@@ -79,8 +79,8 @@ describe('game', () => {
 
   test('the snake speeds up every five foods, down to a floor', () => {
     const game = newGame(10, 6, first)
-    expect(tickMs(game)).toBe(100)
-    expect(tickMs({ ...game, score: 5 })).toBe(93)
+    expect(tickMs(game)).toBe(115)
+    expect(tickMs({ ...game, score: 5 })).toBe(108)
     expect(tickMs({ ...game, score: 100 })).toBe(40)
   })
 
