@@ -3,6 +3,7 @@ import { MIN_HEIGHT, MIN_WIDTH, fitTo, newGame, step, tickMs, turn } from './rul
 const WALL_COLUMNS = 2
 const WALL_ROWS = 2
 const SNAKE_COLOR = '#4ade80'
+const HEAD_COLOR = '#d9f99d'
 const FOOD_COLOR = '#f87171'
 const WALL_COLOR = 'gray'
 const KEY_DIRECTIONS = { up: 'up', down: 'down', left: 'left', right: 'right', w: 'up', s: 'down', a: 'left', d: 'right' }
@@ -44,6 +45,8 @@ function draw(game, { Box, Text }) {
 
 function boardRows(game, Text) {
   const colors = new Map(game.snake.map(([x, y]) => [y * game.width + x, SNAKE_COLOR]))
+  const [headX, headY] = game.snake[0]
+  colors.set(headY * game.width + headX, HEAD_COLOR)
   if (game.food) colors.set(game.food[1] * game.width + game.food[0], FOOD_COLOR)
   const rows = []
   for (let y = 0; y < game.height; y++) {

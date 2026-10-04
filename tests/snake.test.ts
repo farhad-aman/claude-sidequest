@@ -79,8 +79,8 @@ describe('game', () => {
 
   test('the snake speeds up every five foods, down to a floor', () => {
     const game = newGame(10, 6, first)
-    expect(tickMs(game)).toBe(83)
-    expect(tickMs({ ...game, score: 5 })).toBe(76)
+    expect(tickMs(game)).toBe(100)
+    expect(tickMs({ ...game, score: 5 })).toBe(93)
     expect(tickMs({ ...game, score: 100 })).toBe(40)
   })
 
@@ -106,5 +106,17 @@ describe('game', () => {
     const game = snake.start({ columns: 42, rows: 12 })
     expect(game.width).toBe(20)
     expect(game.height).toBe(10)
+  })
+
+  test('the head has its own color, the body stays green', () => {
+    const game = snake.start({ columns: 42, rows: 12 })
+    const colors: string[] = []
+    const Text = (props: any) => {
+      if (props.color) colors.push(props.color)
+      return { type: 'Text', props }
+    }
+    snake.draw(game, { Box: (props: any) => ({ type: 'Box', props }), Text })
+    expect(colors.filter((color) => color === '#d9f99d')).toHaveLength(1)
+    expect(colors).toContain('#4ade80')
   })
 })
