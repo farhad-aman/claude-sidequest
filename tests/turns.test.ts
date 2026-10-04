@@ -67,7 +67,7 @@ describe('turns', () => {
     await startSession($)
     await startTurn($)
     await w.clock.advance(2000)
-    const band = await $.ui.mount({ plugin: 'snake-pane', surface: 'terminal', component: 'AbovePrompt', props: {} as any })
+    const band = await $.ui.mount({ plugin: 'sidequest', surface: 'terminal', component: 'AbovePrompt', props: {} as any })
     expect(await band.find({ key: 'play' })).toBeDefined()
     w.setPlaced(true)
     await band.press({ key: 'play' })

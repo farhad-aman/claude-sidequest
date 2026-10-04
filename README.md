@@ -1,7 +1,9 @@
-# snake-pane
+# Sidequest for Claude Code
 
-Snake in a side pane while Claude works. Text only, so it works in any
-terminal, Warp included.
+Claude does the main quest. You do a side quest: Snake in a side pane while
+Claude works. Text only, so it works in any terminal, Warp included.
+
+Plugin id: `sidequest`.
 
 - After Claude has worked for 2 seconds the pane opens, paused.
 - Click the board once, then press an arrow (or WASD) to play. Space pauses.
@@ -15,15 +17,24 @@ Commands: `/snake` opens it now, `/snake off` stops it opening by itself,
 
 ## Load it
 
-Add the folder to `CLAUDE_CODE_PLUGIN_DIRS` in `~/.claude/settings.json`:
+```bash
+git clone https://github.com/farhad-aman/claude-sidequest ~/projects/sidequest
+```
+
+Add the folder to `CLAUDE_CODE_PLUGIN_DIRS` in `~/.claude/settings.json`,
+then restart Claude Code:
 
 ```json
-"env": { "CLAUDE_CODE_PLUGIN_DIRS": "~/projects/claude-snake" }
+"env": { "CLAUDE_CODE_PLUGIN_DIRS": "~/projects/sidequest" }
 ```
 
 ## Test it
 
 ```bash
-claude plugin test ~/projects/claude-snake
-claude plugin validate ~/projects/claude-snake
+claude plugin test ~/projects/sidequest
+claude plugin validate ~/projects/sidequest
 ```
+
+## License
+
+MIT

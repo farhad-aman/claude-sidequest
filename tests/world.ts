@@ -30,7 +30,7 @@ export function world(on: On, stored: Record<string, unknown> = {}) {
 }
 
 export const PANE_MOUNT = {
-  plugin: 'snake-pane',
+  plugin: 'sidequest',
   surface: 'terminal',
   component: 'Pane',
   requestId: 'snake',

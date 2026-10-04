@@ -1,5 +1,10 @@
 {
-  "name": "snake-pane",
+  "name": "sidequest",
   "version": "0.1.0",
-  "description": "Play Snake in a side pane while Claude works; works in any terminal"
+  "description": "Sidequest for Claude Code: play Snake in a side pane while Claude does the main quest; works in any terminal",
+  "author": { "name": "Farhad Aman" },
+  "homepage": "https://github.com/farhad-aman/claude-sidequest",
+  "repository": "https://github.com/farhad-aman/claude-sidequest",
+  "license": "MIT",
+  "keywords": ["snake", "game", "pane"]
 }
