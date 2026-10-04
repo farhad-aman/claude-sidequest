@@ -12,8 +12,38 @@ Plugin id: `sidequest`.
 - In a terminal under 144 columns, press `1` on the line above the prompt to
   open it.
 
-Commands: `/snake` opens it now, `/snake off` stops it opening by itself,
-`/snake on` turns that back on.
+Commands:
+
+- `/sidequest` opens the pane with the last game.
+- `/sidequest snake` opens Snake.
+- `/sidequest off` stops it opening by itself. `/sidequest on` turns that
+  back on.
+
+With 2 or more games, press `m` in the pane to pick a game.
+
+## Add a game
+
+1. Make a folder `hooks/games/<id>/` with an `index.js`.
+2. Its default export is an object with these parts. The state must be plain
+   JSON data, because it is saved.
+
+   | Part | What it does |
+   | --- | --- |
+   | `id`, `title`, `hint` | Name in the command, name on screen, help line |
+   | `fits(size)` | `size` is `{ columns, rows }` of the play area |
+   | `start(size)` | A new game |
+   | `restore(saved, size)` | The saved game, or `null` |
+   | `key(state, key)` | The next state, or `null` for a key the game does not use |
+   | `stepMs(state)` | Time between moves in ms, or `null` |
+   | `step(state)` | One move |
+   | `score(state)`, `isOver(state)` | For the status line |
+   | `draw(state, { Box, Text })` | The play area, walls included |
+
+3. Add it to the list in `hooks/games/index.js`.
+4. Run the tests. `tests/games.test.ts` checks every game in the list.
+
+The frame owns `Space` (pause) and `m` (menu). `Esc` gives the focus back to
+the terminal, so no game can use it.
 
 ## Load it
 
